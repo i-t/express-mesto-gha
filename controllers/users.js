@@ -60,7 +60,11 @@ const updateInfo = (req, res, next) => {
 const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User
-    .findByIdAndUpdate(req.user._id, { avatar })
+    .findByIdAndUpdate(
+      req.user._id,
+      { avatar },
+      { new: true },
+    )
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
