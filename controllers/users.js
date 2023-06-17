@@ -15,14 +15,12 @@ const getUsers = (req, res) => {
 const getUserById = (req, res) => {
   User
     .findById(req.params.userId)
-    .orFail(() => {
-      throw new Error('404');
-    })
+    .orFail()
     .then((user) => {
       res.send(user);
     })
     .catch((err) => {
-      if (err.message === '404') {
+      if (err.message === 'DocumentNotFoundError') {
         res.status(404).send({
           message: 'User Not Found',
         });
