@@ -11,13 +11,16 @@ const getUsers = (req, res, next) => {
 const getUserById = (req, res, next) => {
   User
     .findById(req.params.userId)
-    .orFail()
     .then((user) => {
+      if (!user) {
+        res.status(404).send({ message: 'User Not Found' });
+        return;
+      }
       res.send(user);
     })
     .catch((err) => {
-      if (err.message === 'DocumentNotFoundError') {
-        res.status(404).send({ message: 'User Not Found' });
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Incorrect Data' });
         return;
       } next(err);
     });
@@ -40,9 +43,18 @@ const createUser = (req, res, next) => {
 const updateInfo = (req, res, next) => {
   const { name, about } = req.body;
   User
-    .findByIdAndUpdate(req.user._id, { name, about })
+    .findByIdAndUpdate(
+      req.user._id,
+      { name, about },
+      { new: true, runValidators: true },
+    )
     .then((user) => res.status(200).send(user))
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Incorrect Data' });
+        return;
+      } next(err);
+    });
 };
 
 const updateAvatar = (req, res, next) => {
@@ -50,7 +62,12 @@ const updateAvatar = (req, res, next) => {
   User
     .findByIdAndUpdate(req.user._id, { avatar })
     .then((user) => res.status(200).send(user))
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Incorrect Data' });
+        return;
+      } next(err);
+    });
 };
 
 module.exports = {
