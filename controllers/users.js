@@ -50,7 +50,7 @@ const updateInfo = (req, res, next) => {
     )
     .then((user) => res.status(200).send(user))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err instanceof mongoose.Error.ValidationError) {
         res.status(400).send({ message: 'Incorrect Data' });
         return;
       } next(err);
@@ -63,7 +63,7 @@ const updateAvatar = (req, res, next) => {
     .findByIdAndUpdate(req.user._id, { avatar })
     .then((user) => res.status(200).send(user))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err instanceof mongoose.Error.ValidationError) {
         res.status(400).send({ message: 'Incorrect Data' });
         return;
       } next(err);
