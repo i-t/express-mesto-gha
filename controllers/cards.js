@@ -35,19 +35,16 @@ const createCard = (req, res) => {
 };
 
 const deleteCards = (req, res) => {
+  const { cardId } = req.params;
   Card
-    .findById(req.params.cardId)
+    .findByIdAndRemove(cardId)
     .orFail(() => {
-      throw new Error('404');
+      throw new Error('400');
     })
-    .then((card) => {
-      Card.deleteOne(card);
-      res.status(200).send({ message: 'Removed' });
-    })
-
+    .then((card) => res.status(200).send({ message: 'Card Removed' }))
     .catch((err) => {
-      if (err.message === '404') {
-        res.status(404).send({ message: 'Card Not Found' });
+      if (err.message === '400') {
+        res.status(400).send({ message: 'Bad Request' });
 
         return;
       }
@@ -57,6 +54,28 @@ const deleteCards = (req, res) => {
         stack: err.stack,
       });
     });
+  // Card
+  //   .findById(req.params.cardId)
+  //   .orFail(() => {
+  //     throw new Error('404');
+  //   })
+  //   .then((card) => {
+  //     Card.deleteOne(card);
+  //     res.status(200).send({ message: 'Removed' });
+  //   })
+
+  //   .catch((err) => {
+  //     if (err.message === '404') {
+  //       res.status(404).send({ message: 'Card Not Found' });
+
+  //       return;
+  //     }
+  //     res.status(500).send({
+  //       message: 'Internal Server Error',
+  //       err: err.message,
+  //       stack: err.stack,
+  //     });
+  //   });
 };
 
 const likeCard = (req, res) => Card
@@ -90,7 +109,7 @@ const dislikeCard = (req, res) => Card
   .orFail(() => {
     throw new Error('404');
   })
-  .then(() => res.status(200).send({ message: 'Card liked' }))
+  .then(() => res.status(200).send({ message: 'Card disliked' }))
   .catch((err) => {
     if (err.message === '404') {
       res.status(404).send({ message: 'User Not Found' });
