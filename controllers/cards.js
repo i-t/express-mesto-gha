@@ -86,7 +86,8 @@ const likeCard = (req, res) => Card
   })
   .catch((err) => {
     if (err.name === 'CastError') {
-      return res.status(400).send({ message: 'Incorrect Data' });
+      res.status(400).send({ message: 'Incorrect Data' });
+      return;
     }
 
     res.status(500).send({
