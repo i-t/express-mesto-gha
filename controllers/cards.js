@@ -70,10 +70,6 @@ const likeCard = (req, res) => Card
   })
   .then(() => res.status(200).send({ message: 'Card liked' }))
   .catch((err) => {
-    if (err instanceof mongoose.Error.ValidationError) {
-      res.status(400).send({ message: 'Validation Error' });
-      return;
-    }
     if (err.message === '404') {
       res.status(404).send({ message: 'User Not Found' });
       return;
@@ -96,10 +92,6 @@ const dislikeCard = (req, res) => Card
   })
   .then(() => res.status(200).send({ message: 'Card liked' }))
   .catch((err) => {
-    if (err instanceof mongoose.Error.ValidationError) {
-      res.status(400).send({ message: 'Validation Error' });
-      return;
-    }
     if (err.message === '404') {
       res.status(404).send({ message: 'User Not Found' });
       return;
