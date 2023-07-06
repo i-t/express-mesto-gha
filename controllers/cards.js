@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 const Card = require('../models/card');
 
+const BadRequestError = require('../utils/errors/BadRequestError');
+const NotFoundError = require('../utils/errors/NotFoundError');
+const ForbiddenError = require('../utils/errors/ForbiddenError');
+
 const getCards = (req, res, next) => {
   Card
     .find({})
@@ -15,7 +19,7 @@ const createCard = (req, res, next) => {
     .then((card) => res.status(201).send(card))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        res.status(400).send({ message: 'Incorrect Data', stack: err.stack });
+        next(new BadRequestError(`Некорректные данные. ${err.message}`));
       } else {
         next(err);
       }
@@ -24,15 +28,27 @@ const createCard = (req, res, next) => {
 
 const deleteCards = (req, res, next) => {
   const { cardId } = req.params;
+
   Card
-    .findByIdAndRemove(cardId)
+    .findById(cardId)
     .orFail()
-    .then(() => res.status(200).send({ message: 'Card Removed' }))
+    .then((card) => {
+      const owner = card.owner.toString();
+      const user = req.user._id.toString();
+      if (owner === user) {
+        Card.deleteOne(card)
+          .then(() => {
+            res.status(200).send({ message: 'Карточка удалена' });
+          });
+      } else {
+        throw new ForbiddenError('У вас недостаточно прав');
+      }
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Incorrect Data' });
+        next(new BadRequestError('Некорректные данные'));
       } else if (err.name === 'DocumentNotFoundError') {
-        res.status(404).send({ message: 'Card Not Found' });
+        next(new NotFoundError('Карточка не найдена'));
       } else {
         next(err);
       }
@@ -47,14 +63,13 @@ const likeCard = (req, res, next) => Card
   )
   .then((card) => {
     if (!card) {
-      res.status(404).send({ message: 'Card Not Found' });
-      return;
+      throw new NotFoundError('Карточка не найдена');
     }
-    res.status(200).send({ message: 'Card liked' });
+    res.status(200).send({ message: 'Вы лайкнули карточку' });
   })
   .catch((err) => {
     if (err.name === 'CastError') {
-      res.status(400).send({ message: 'Incorrect Data' });
+      next(new BadRequestError('Некорректные данные'));
     } else {
       next(err);
     }
@@ -68,14 +83,13 @@ const dislikeCard = (req, res, next) => Card
   )
   .then((card) => {
     if (!card) {
-      res.status(404).send({ message: 'Card Not Found' });
-      return;
+      throw new NotFoundError('Карточка не найдена');
     }
-    res.status(200).send({ message: 'Card disliked' });
+    res.status(200).send({ message: 'Вы сняли лайк с карточки' });
   })
   .catch((err) => {
     if (err.name === 'CastError') {
-      res.status(400).send({ message: 'Incorrect Data' });
+      next(new BadRequestError('Некорректные данные'));
     } else {
       next(err);
     }

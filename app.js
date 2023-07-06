@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
+
 const router = require('./routes/index');
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {});
@@ -9,21 +10,16 @@ const app = express();
 app.use(express.json());
 app.use(helmet());
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: new mongoose.Types.ObjectId('648c63806c330125165e81ec'),
-  };
-  next();
-});
-
 app.use(router);
 
 app.use((err, req, res, next) => {
-  next(res.status(500).send({
-    message: 'Internal Server Error',
-    err: err.message,
-    stack: err.stack,
-  }));
+  const { statusCode = 500, message } = err;
+  res.status(statusCode)
+    .send({
+      message: statusCode === 500
+        ? 'На сервере произошла ошибка'
+        : message,
+    });
 });
 
 app.listen(3000, () => {
