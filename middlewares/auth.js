@@ -23,7 +23,7 @@ const auth = (req, res, next) => {
     req.user = {
       _id: new mongoose.Types.ObjectId(payload._id),
     };
-    next();
+    return next();
   } catch (err) {
     return res.status(401)
       .send({ message: 'Пользователь не авторизован' });

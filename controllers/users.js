@@ -28,7 +28,7 @@ const getUserById = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         return next(new BadRequestError('Некорректные данные'));
-      } next(err);
+      } return next(err);
     });
 };
 
@@ -85,7 +85,7 @@ const updateInfo = (req, res, next) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         return next(new BadRequestError(`Некорректные данные. ${err.message}`));
-      } next(err);
+      } return next(err);
     });
 };
 
@@ -101,7 +101,7 @@ const updateAvatar = (req, res, next) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         return next(new BadRequestError(`Некорректные данные. ${err.message}`));
-      } next(err);
+      } return next(err);
     });
 };
 
