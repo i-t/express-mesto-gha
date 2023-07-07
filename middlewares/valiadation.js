@@ -33,7 +33,7 @@ module.exports.validateUserAvatar = celebrate({
 
 module.exports.validationUserById = celebrate({
   params: Joi.object().keys({
-    id: Joi.string().alphanum().length(24).hex(),
+    userId: Joi.string().alphanum().length(24).hex(),
   }),
 });
 
@@ -44,20 +44,8 @@ module.exports.validateCreateCard = celebrate({
   }),
 });
 
-module.exports.validateLikeCard = celebrate({
+module.exports.validateCardId = celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().length(24).hex().required(),
-  }),
-});
-
-module.exports.validateDislikeCard = celebrate({
-  params: Joi.object().keys({
-    cardId: Joi.string().length(24).hex().required(),
-  }),
-});
-
-module.exports.validationDeleteCard = celebrate({
-  params: Joi.object().keys({
-    id: Joi.string().alphanum().length(24).hex(),
+    cardId: Joi.string().hex().length(24).required(),
   }),
 });
