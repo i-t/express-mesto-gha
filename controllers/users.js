@@ -43,19 +43,27 @@ const createUser = (req, res, next) => {
 
   bcrypt
     .hash(password, 10)
-    .then((hash) => User.create({
-      name,
-      about,
-      avatar,
-      email,
-      password: hash,
-    })
-      .then((user) => res.status(201).send(user))
-      .catch((err) => {
-        if (err instanceof mongoose.Error.ValidationError) {
-          return next(new ConflictError('Пользователь с таким email уже зарегистрирован'));
-        } next(err);
-      }));
+    .then((hash) => User.create(
+      {
+        name,
+        about,
+        avatar,
+        email,
+        password: hash,
+      },
+    ))
+    .then(() => res.status(201)
+      .send({
+        name,
+        about,
+        avatar,
+        email,
+      }))
+    .catch((err) => {
+      if (err.code === 11000) {
+        return next(new ConflictError('Пользователь с таким email уже зарегистрирован'));
+      } return next(err);
+    });
 };
 
 const getMyInfo = (req, res, next) => {
