@@ -36,13 +36,12 @@ const deleteCards = (req, res, next) => {
       const owner = card.owner.toString();
       const user = req.user._id.toString();
       if (owner === user) {
-        Card.deleteOne(card)
+        return Card.deleteOne(card)
           .then(() => {
             res.status(200).send({ message: 'Карточка удалена' });
           });
-      } else {
-        throw new ForbiddenError('У вас недостаточно прав');
       }
+      return next(new ForbiddenError('У вас недостаточно прав'));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
