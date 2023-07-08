@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 
-const BadRequestError = require('../utils/errors/BadRequestError');
+const UnauthorizedError = require('../utils/errors/UnauthorizedError');
 
 const SECRET_KEY = 'super-secret-key';
 
@@ -15,7 +15,7 @@ function signToken(payload) {
 
 const auth = (req, res, next) => {
   if (!req.headers.authorization) {
-    next(new BadRequestError('Нет заголовка авторизации'));
+    next(new UnauthorizedError('Нет заголовка авторизации'));
   }
   const token = req.headers.authorization.replace('Bearer ', '');
 
@@ -26,7 +26,7 @@ const auth = (req, res, next) => {
     };
     return next();
   } catch (err) {
-    return next(new BadRequestError('Пользователь не авторизован'));
+    return next(new UnauthorizedError('Пользователь не авторизован'));
   }
 };
 
