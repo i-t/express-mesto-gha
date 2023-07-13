@@ -15,7 +15,7 @@ function signToken(payload) {
 
 const auth = (req, res, next) => {
   if (!req.headers.authorization) {
-    next(new UnauthorizedError('Нет заголовка авторизации'));
+    return next(new UnauthorizedError('Нет заголовка авторизации'));
   }
   const token = req.headers.authorization.replace('Bearer ', '');
 
